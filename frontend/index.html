@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CertiChain – Verifikasi Sertifikat</title>
+<style>
+  :root { --bg:#fff; --fg:#1b1f23; --card:#f4f6f8; --acc:#0b6b3a; --bad:#b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14181c; --fg:#e8eaed; --card:#1f252b; --acc:#4cc38a; --bad:#ff8a80; } }
+  body { font-family: system-ui, sans-serif; background:var(--bg); color:var(--fg); max-width:760px; margin:2rem auto; padding:0 1rem; }
+  .card { background:var(--card); border-radius:10px; padding:1rem; margin:1rem 0; }
+  input, button { font:inherit; padding:.5rem; margin:.25rem 0; width:100%; box-sizing:border-box; }
+  button { background:var(--acc); color:#fff; border:0; border-radius:6px; cursor:pointer; }
+  pre { white-space:pre-wrap; word-break:break-all; font-size:.85rem; }
+  .bad { color:var(--bad); }
+</style>
+</head>
+<body>
+<h1>CertiChain</h1>
+<p>Registri sertifikat digital (local blockchain / testnet saja). Hanya <em>hash</em> dokumen yang dicatat on-chain.</p>
+
+<div class="card">
+  <h3>1. Koneksi</h3>
+  <input id="addr" placeholder="Alamat kontrak (lihat deployments/localhost.json)">
+  <input id="rpc" value="http://127.0.0.1:8545" placeholder="RPC URL (untuk mode baca tanpa wallet)">
+  <button id="btnConnect">Hubungkan wallet (MetaMask) / pakai RPC lokal</button>
+  <pre id="conn">Belum terhubung.</pre>
+</div>
+
+<div class="card">
+  <h3>2. Hash dokumen (dilakukan di browser, berkas tidak dikirim ke mana pun)</h3>
+  <input type="file" id="file">
+  <pre id="hash">keccak256: -</pre>
+</div>
+
+<div class="card">
+  <h3>3. Verifikasi (publik)</h3>
+  <input id="issuerIn" placeholder="Alamat issuer penerbit">
+  <button id="btnVerify">Verifikasi sertifikat dari hash di atas</button>
+  <pre id="verifyOut"></pre>
+</div>
+
+<div class="card">
+  <h3>4. Terbitkan / Cabut (hanya issuer terdaftar)</h3>
+  <input id="holderIn" placeholder="Alamat holder (penerima)">
+  <button id="btnIssue">Terbitkan sertifikat</button>
+  <button id="btnRevoke">Cabut sertifikat (hash di atas, issuer = akun terhubung)</button>
+  <pre id="txOut"></pre>
+</div>
+
+<script src="vendor/ethers.umd.min.js"></script>
+<script>
+const ABI = [
+  "function issueCertificate(bytes32 docHash, address holder, uint64 expiresAt) returns (bytes32)",
+  "function revokeCertificate(bytes32 id, bytes32 reasonCode)",
+  "function verifyCertificate(bytes32 id) view returns (uint8 status, address issuer, address holder, bytes32 docHash, uint64 issuedAt, uint64 expiresAt)",
+  "event CertificateIssued(bytes32 indexed id, address indexed issuer, address indexed holder, bytes32 docHash, uint64 expiresAt)",
+  "event CertificateRevoked(bytes32 indexed id, address indexed revokedBy, bytes32 reasonCode)"
+];
+const STATUS = ["NotFound", "Valid", "Revoked", "Expired"];
+const $ = (id) => document.getElementById(id);
+let contract, signer, docHash;
+
+const certId = (issuer) => ethers.keccak256(ethers.AbiCoder.defaultAbiCoder().encode(["address","bytes32"], [issuer, docHash]));
+const show = (el, msg, bad) => { el.textContent = msg; el.className = bad ? "bad" : ""; };
+
+$("btnConnect").onclick = async () => {
+  try {
+    const provider = window.ethereum ? new ethers.BrowserProvider(window.ethereum) : new ethers.JsonRpcProvider($("rpc").value);
+    if (window.ethereum) await provider.send("eth_requestAccounts", []);
+    signer = await provider.getSigner();
+    contract = new ethers.Contract($("addr").value.trim(), ABI, signer);
+    const net = await provider.getNetwork();
+    show($("conn"), `Terhubung. chainId=${net.chainId}\nakun=${await signer.getAddress()}`);
+  } catch (e) { show($("conn"), "Gagal: " + (e.shortMessage || e.message), true); }
+};
+
+$("file").onchange = async (ev) => {
+  const buf = new Uint8Array(await ev.target.files[0].arrayBuffer());
+  docHash = ethers.keccak256(buf);
+  show($("hash"), "keccak256: " + docHash);
+};
+
+$("btnVerify").onclick = async () => {
+  try {
+    const v = await contract.verifyCertificate(certId($("issuerIn").value.trim()));
+    show($("verifyOut"), `Status : ${STATUS[v.status]}\nIssuer : ${v.issuer}\nHolder : ${v.holder}\nDiterbitkan: ${new Date(Number(v.issuedAt)*1000).toISOString()}\nKedaluwarsa: ${v.expiresAt == 0n ? "tidak ada" : new Date(Number(v.expiresAt)*1000).toISOString()}`);
+  } catch (e) { show($("verifyOut"), "Gagal: " + (e.shortMessage || e.message), true); }
+};
+
+$("btnIssue").onclick = async () => {
+  try {
+    const tx = await contract.issueCertificate(docHash, $("holderIn").value.trim(), 0);
+    const r = await tx.wait();
+    show($("txOut"), `OK  tx=${tx.hash}\nblock=${r.blockNumber}\nEvent CertificateIssued dicatat.`);
+  } catch (e) { show($("txOut"), "Ditolak kontrak: " + (e.reason || e.shortMessage || e.message), true); }
+};
+
+$("btnRevoke").onclick = async () => {
+  try {
+    const me = await signer.getAddress();
+    const tx = await contract.revokeCertificate(certId(me), ethers.encodeBytes32String("REVOKED"));
+    const r = await tx.wait();
+    show($("txOut"), `OK  tx=${tx.hash}\nblock=${r.blockNumber}\nEvent CertificateRevoked dicatat.`);
+  } catch (e) { show($("txOut"), "Ditolak kontrak: " + (e.reason || e.shortMessage || e.message), true); }
+};
+</script>
+</body>
+</html>

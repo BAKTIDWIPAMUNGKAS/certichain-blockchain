@@ -1,0 +1,18 @@
+digraph G {
+  rankdir=TB; fontname="Helvetica"; node [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", fillcolor="#eef3f8", color="#445566"]; edge [fontname="Helvetica", fontsize=9];
+  label="Arsitektur CertiChain (DApp registri sertifikat) - local blockchain chainId 31337"; labelloc=t; fontsize=14;
+  subgraph cluster_client { label="Client"; style=dashed; color="#888888";
+    FE [label="Frontend web\n(index.html + ethers.js v6)\nhash berkas di browser", fillcolor="#e3f2e6"];
+    SC [label="Script integrasi\n(scripts/interact.js)", fillcolor="#e3f2e6"]; }
+  W [label="Wallet / Provider\n(MetaMask atau\nJSON-RPC lokal)", fillcolor="#fff4d6"];
+  subgraph cluster_chain { label="Jaringan blockchain (Hardhat node, chain ID 31337)"; style=filled; fillcolor="#f7f7f7"; color="#888888";
+    CC [label="CertiChain.sol\n(ICertificateRegistry + AccessRoles + CertLib)\nRole: ADMIN, ISSUER\nstake, sertifikat (hash), event", fillcolor="#dbe9fb"];
+    EV [label="Event log\nCertificateIssued / Revoked\nRoleGranted / Slashed", fillcolor="#dbe9fb"]; }
+  subgraph cluster_off { label="Off-chain"; style=dashed; color="#888888";
+    ST [label="Penyimpanan berkas sertifikat (PDF)\n+ data pribadi holder\n(DB institusi / IPFS terenkripsi)", fillcolor="#fde2e2"];
+    IDX [label="Indexer / verifier publik\n(baca event & verify)", fillcolor="#fde2e2"]; }
+  FE -> W [label="request akun\n& tanda tangan tx"]; SC -> W;
+  W -> CC [label="eth_sendTransaction\n/ eth_call"];
+  CC -> EV [label="emit"]; EV -> IDX [label="queryFilter"]; FE -> ST [label="unggah/ambil PDF\n(bukan on-chain)", style=dashed];
+  ST -> FE [label="keccak256(PDF)=docHash", style=dashed, constraint=false];
+}

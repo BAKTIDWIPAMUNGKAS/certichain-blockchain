@@ -1,0 +1,13 @@
+digraph F {
+  rankdir=TB; fontname="Helvetica"; node [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled", fillcolor="#eef3f8", color="#445566"]; edge [fontname="Helvetica", fontsize=9];
+  label="Alur transaksi utama CertiChain"; labelloc=t; fontsize=14;
+  a [label="1. Calon issuer: depositStake() >= 1 ETH (uji)"];
+  b [label="2. ADMIN: approveIssuer(addr)\nsyarat stake >= MIN_STAKE -> ISSUER_ROLE"];
+  c [label="3. Off-chain: institusi membuat PDF,\nhitung docHash = keccak256(PDF)"];
+  d [label="4. ISSUER: issueCertificate(docHash, holder, expiresAt)\nid = keccak256(issuer, docHash)\nemit CertificateIssued", fillcolor="#dbe9fb"];
+  e [label="5. Verifier (siapa pun): hash PDF dari holder,\nverifyCertificate(id) [view, gratis]\nhasil: Valid / Revoked / Expired / NotFound", fillcolor="#e3f2e6"];
+  f [label="6. ISSUER asli atau ADMIN: revokeCertificate(id, reason)\nemit CertificateRevoked", fillcolor="#fde2e2"];
+  g [label="7. Sanksi: ADMIN slash(issuer) -> stake berkurang,\nissuer otomatis ditangguhkan bila stake < MIN", fillcolor="#fff4d6"];
+  h [label="8. Issuer resign -> withdrawStake()\n(CEI + nonReentrant + cek hasil transfer)"];
+  a->b->c->d->e; d->f; f->e [style=dashed, label="status berubah"]; b->g [style=dashed]; g->h [style=dashed, label="bila resign"];
+}
