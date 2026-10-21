@@ -1,0 +1,7 @@
+[depositStake(issuer, 1 ETH)] tx=0x32eba769438b69862e2c233d6e3674520290f14c9f78c37c96a97ae3ab05d821 block=2 gas=44958 events=StakeDeposited
+[approveIssuer(admin)] tx=0xd4b290a2f9c093020ddc0608c45f6f4786cda3fab7878a5dfbe1a7a5dc383000 block=3 gas=50907 events=RoleGranted
+[issueCertificate(issuer)] tx=0xeca5fb4884b69e4a1861b1d6d05e14ac44c5948db7bbdba77735ff5eb3785013 block=4 gas=141450 events=CertificateIssued
+verify#1 -> Valid issuer=0x70997970C51812dc3A010C7d01b50e0d17dc79C8 holder=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+[revokeCertificate(issuer)] tx=0x4d2fffe31230347c69aa0415c908ec064d6b4072ee88c8229bc1ad72ee842660 block=5 gas=29613 events=CertificateRevoked
+verify#2 -> Revoked
+queryFilter -> Issued=1 Revoked=1

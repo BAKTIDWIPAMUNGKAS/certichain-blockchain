@@ -1,0 +1,80 @@
+{
+  "network": "localhost",
+  "chainId": 31337,
+  "contract": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "steps": [
+    {
+      "step": "depositStake(issuer, 1 ETH)",
+      "txHash": "0x32eba769438b69862e2c233d6e3674520290f14c9f78c37c96a97ae3ab05d821",
+      "block": 2,
+      "gasUsed": "44958",
+      "events": [
+        {
+          "name": "StakeDeposited",
+          "args": {
+            "account": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+            "amount": "1000000000000000000"
+          }
+        }
+      ]
+    },
+    {
+      "step": "approveIssuer(admin)",
+      "txHash": "0xd4b290a2f9c093020ddc0608c45f6f4786cda3fab7878a5dfbe1a7a5dc383000",
+      "block": 3,
+      "gasUsed": "50907",
+      "events": [
+        {
+          "name": "RoleGranted",
+          "args": {
+            "role": "0x114e74f6ea3bd819998f78687bfcb11b140da08e9b7d222fa9c1f1ba1f2aa122",
+            "account": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+            "by": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+          }
+        }
+      ]
+    },
+    {
+      "step": "issueCertificate(issuer)",
+      "txHash": "0xeca5fb4884b69e4a1861b1d6d05e14ac44c5948db7bbdba77735ff5eb3785013",
+      "block": 4,
+      "gasUsed": "141450",
+      "events": [
+        {
+          "name": "CertificateIssued",
+          "args": {
+            "id": "0x29e8ef0fec08bb6c68ff6d970d246b5d85955ddfb7ccaccedf0d01dce0092fc4",
+            "issuer": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+            "holder": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "docHash": "0xa2efb33f76ce1a0db2a0ee6e5c9f960b4f470e52a83399de0df0a42eee0eaf60",
+            "expiresAt": "1824108483"
+          }
+        }
+      ]
+    },
+    {
+      "step": "revokeCertificate(issuer)",
+      "txHash": "0x4d2fffe31230347c69aa0415c908ec064d6b4072ee88c8229bc1ad72ee842660",
+      "block": 5,
+      "gasUsed": "29613",
+      "events": [
+        {
+          "name": "CertificateRevoked",
+          "args": {
+            "id": "0x29e8ef0fec08bb6c68ff6d970d246b5d85955ddfb7ccaccedf0d01dce0092fc4",
+            "revokedBy": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+            "reasonCode": "0x53414c41485f4441544100000000000000000000000000000000000000000000"
+          }
+        }
+      ]
+    }
+  ],
+  "verifyBeforeRevoke": "Valid",
+  "verifyAfterRevoke": "Revoked",
+  "certificateId": "0x29e8ef0fec08bb6c68ff6d970d246b5d85955ddfb7ccaccedf0d01dce0092fc4",
+  "docHash": "0xa2efb33f76ce1a0db2a0ee6e5c9f960b4f470e52a83399de0df0a42eee0eaf60",
+  "eventCount": {
+    "issued": 1,
+    "revoked": 1
+  }
+}

@@ -1,0 +1,102 @@
+
+Version
+=======
+> solidity-coverage: v0.8.14
+
+Instrumenting for coverage...
+=============================
+
+> access/AccessRoles.sol
+> audit/CertiChainV1.sol
+> CertiChain.sol
+> interfaces/ICertificateRegistry.sol
+> libraries/CertLib.sol
+> mocks/ReentrancyAttacker.sol
+> mocks/RejectingReceiver.sol
+
+Compilation:
+============
+
+Compiled 7 Solidity files successfully (evm target: paris).
+
+Network Info
+============
+> HardhatEVM: v2.22.17
+> network:    hardhat
+
+
+
+  Audit PoC - eksploit pada CertiChainV1 (baseline)
+      [A-01] saldo attacker=3.0 ETH, saldo kontrak=0.0 ETH, reentries=2
+    ✔ PoC-A-01 reentrancy menguras seluruh stake issuer lain (attacker setor 1 ETH, tarik 3 ETH) (137ms)
+    ✔ PoC-A-02 issuer B berhasil mencabut sertifikat milik issuer A
+    ✔ PoC-A-03 issuer B menyerobot (front-run) hash dokumen sehingga penerbitan issuer A gagal & holder salah
+      [A-04] gas(10)=131868, gas(200)=2118710, gas/sertifikat≈10457, batas blok 30M ≈ 2868 sertifikat per holder
+    ✔ PoC-A-04 gas revokeAllForHolder tumbuh linear tanpa batas (risiko DoS pada block gas limit) (1625ms)
+    ✔ PoC-A-05 V1 menerima holder=address(0), hash=0, dan expiry di masa lalu
+    ✔ PoC-A-07 penarikan ke kontrak yang menolak ETH: stake terhapus, dana terkunci permanen
+
+  CertiChain v2 - unit test
+    Deployment & konfigurasi
+      ✔ T-01 admin awal diset, adminCount=1, konstanta benar (54ms)
+      ✔ T-02 constructor menolak admin address(0)
+    Tata kelola & kontrol akses (ADMIN)
+      ✔ T-03 [akses] non-admin tidak dapat approveIssuer / setPaused / slash / grantAdmin
+      ✔ T-04 admin dapat menambah admin kedua dan mencabutnya; admin terakhir tidak dapat dicabut
+      ✔ T-05 [batas] grantAdmin(address(0)) ditolak
+    Stake & onboarding issuer
+      ✔ T-06 [batas] approve gagal pada stake MIN_STAKE-1 wei, berhasil tepat MIN_STAKE
+      ✔ T-07 depositStake bernilai 0 ditolak
+      ✔ T-08 issuer aktif tidak dapat menarik stake; setelah resign dapat menarik penuh
+      ✔ T-09 withdrawStake tanpa stake ditolak (NoStake)
+      ✔ T-10 slash mengurangi stake, menangguhkan issuer otomatis, dan admin dapat menarik slashedPool
+      ✔ T-11 [batas] slash melebihi stake ditolak; withdrawSlashed ke address(0) ditolak
+      ✔ T-12 suspendIssuer mencabut hak menerbitkan
+    Penerbitan sertifikat
+      ✔ T-13 [positif] issuer menerbitkan sertifikat; event & state sesuai
+      ✔ T-14 [akses] non-issuer / admin tidak dapat menerbitkan
+      ✔ T-15 [negatif][A-05] hash nol, holder nol ditolak
+      ✔ T-16 [batas][A-05] expiry tepat = waktu blok ditolak, = waktu blok+1 diterima, 0 = tanpa kedaluwarsa
+      ✔ T-17 [negatif] penerbitan ganda oleh issuer yang sama ditolak
+      ✔ T-18 [A-03 retest] issuer lain tidak dapat menyerobot hash yang sama; kedua ID berbeda
+      ✔ T-19 setPaused menghentikan penerbitan; unpause memulihkan; pencabutan tetap bisa saat pause
+    Verifikasi & pencabutan
+      ✔ T-20 verifikasi ID tak dikenal = NotFound
+      ✔ T-21 [batas] sertifikat menjadi Expired tepat pada expiresAt
+      ✔ T-22 issuer asli dapat mencabut; event & status Revoked
+      ✔ T-23 ADMIN dapat mencabut sertifikat issuer mana pun
+      ✔ T-24 [akses][A-02 retest] issuer lain & pihak luar tidak dapat mencabut
+      ✔ T-25 [negatif] cabut dua kali / ID tak ada ditolak
+      ✔ T-26 issuer yang sudah resign tetap dapat mencabut sertifikat miliknya
+    Batch & paginasi [A-04 retest]
+      ✔ T-27 [batas] revokeBatch 50 item berhasil, 51 item ditolak BatchTooLarge (596ms)
+      ✔ T-28 [akses] batch yang memuat sertifikat issuer lain di-revert seluruhnya (atomik) (52ms)
+      ✔ T-29 [batas] paginasi getHolderCertificates (offset/limit/di luar rentang) (51ms)
+    Retest kerentanan finansial [A-01, A-07]
+      ✔ T-30 [A-01 retest] serangan reentrancy pada withdrawStake gagal; dana kontrak utuh
+      ✔ T-31 [A-07 retest] penarikan ke kontrak yang menolak ETH di-revert dan stake tidak hilang
+
+
+  37 passing (3s)
+
+---------------------------|----------|----------|----------|----------|----------------|
+File                       |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+---------------------------|----------|----------|----------|----------|----------------|
+ contracts/                |      100 |       90 |      100 |      100 |                |
+  CertiChain.sol           |      100 |       90 |      100 |      100 |                |
+ contracts/access/         |      100 |    83.33 |      100 |      100 |                |
+  AccessRoles.sol          |      100 |    83.33 |      100 |      100 |                |
+ contracts/audit/          |       96 |    53.85 |       80 |    96.88 |                |
+  CertiChainV1.sol         |       96 |    53.85 |       80 |    96.88 |            111 |
+ contracts/interfaces/     |      100 |      100 |      100 |      100 |                |
+  ICertificateRegistry.sol |      100 |      100 |      100 |      100 |                |
+ contracts/libraries/      |      100 |      100 |      100 |      100 |                |
+  CertLib.sol              |      100 |      100 |      100 |      100 |                |
+ contracts/mocks/          |       80 |      100 |       80 |      100 |                |
+  ReentrancyAttacker.sol   |    66.67 |      100 |    66.67 |      100 |                |
+  RejectingReceiver.sol    |      100 |      100 |      100 |      100 |                |
+---------------------------|----------|----------|----------|----------|----------------|
+All files                  |    97.96 |    81.25 |    92.68 |    99.18 |                |
+---------------------------|----------|----------|----------|----------|----------------|
+
+> Istanbul reports written to ./coverage/ and ./coverage.json

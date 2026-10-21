@@ -1,0 +1,4 @@
+0ebe60b | Tim UAS Blockchain | 2026-10-21 08:49:33 +0000 | feat: deploy & integrasi client, frontend verifikasi, diagram, kasus debugging
+713466f | Tim UAS Blockchain | 2026-10-21 08:49:33 +0000 | fix(security): CertiChain v2 - perbaikan A-01..A-07 + 31 unit test (retest)
+5b6ae73 | Tim UAS Blockchain | 2026-10-21 08:49:33 +0000 | test(audit): PoC eksploit A-01..A-05, A-07 terhadap CertiChainV1
+1caf3a8 | Tim UAS Blockchain | 2026-10-21 08:49:33 +0000 | feat: baseline CertiChainV1 (vulnerable-by-design) + interface, library, RBAC, mocks

@@ -1,0 +1,56 @@
+'npx hardhat clean' running (wd: /home/claude/uas/certichain)
+'npx hardhat clean --global' running (wd: /home/claude/uas/certichain)
+'npx hardhat compile --force' running (wd: /home/claude/uas/certichain)
+INFO:Detectors:
+Detector: arbitrary-send-eth
+CertiChain.withdrawSlashed(address) (contracts/CertiChain.sol#110-118) sends eth to arbitrary user
+	Dangerous calls:
+	- (ok,None) = to.call{value: amount}() (contracts/CertiChain.sol#115)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+INFO:Detectors:
+Detector: reentrancy-eth
+Reentrancy in CertiChainV1.withdrawStake() (contracts/audit/CertiChainV1.sol#56-62):
+	External calls:
+	- msg.sender.call{value: amount}() (contracts/audit/CertiChainV1.sol#59)
+	State variables written after the call(s):
+	- stakeOf[msg.sender] = 0 (contracts/audit/CertiChainV1.sol#60)
+	CertiChainV1.stakeOf (contracts/audit/CertiChainV1.sol#25) can be used in cross function reentrancies:
+	- CertiChainV1.approveIssuer(address) (contracts/audit/CertiChainV1.sol#49-52)
+	- CertiChainV1.depositStake() (contracts/audit/CertiChainV1.sol#44-47)
+	- CertiChainV1.stakeOf (contracts/audit/CertiChainV1.sol#25)
+	- CertiChainV1.withdrawStake() (contracts/audit/CertiChainV1.sol#56-62)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+INFO:Detectors:
+Detector: unchecked-lowlevel
+CertiChainV1.withdrawStake() (contracts/audit/CertiChainV1.sol#56-62) ignores return value by msg.sender.call{value: amount}() (contracts/audit/CertiChainV1.sol#59)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-low-level-calls
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in CertiChainV1.withdrawStake() (contracts/audit/CertiChainV1.sol#56-62):
+	External calls:
+	- msg.sender.call{value: amount}() (contracts/audit/CertiChainV1.sol#59)
+	Event emitted after the call(s):
+	- StakeWithdrawn(msg.sender,amount) (contracts/audit/CertiChainV1.sol#61)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+INFO:Detectors:
+Detector: timestamp
+CertiChain.issueCertificate(bytes32,address,uint64) (contracts/CertiChain.sol#144-167) uses timestamp for comparisons
+	Dangerous comparisons:
+	- expiresAt != 0 && expiresAt <= block.timestamp (contracts/CertiChain.sol#152)
+CertiChainV1.verifyCertificate(bytes32) (contracts/audit/CertiChainV1.sol#99-108) uses timestamp for comparisons
+	Dangerous comparisons:
+	- status == Status.Valid && c.expiresAt != 0 && block.timestamp >= c.expiresAt (contracts/audit/CertiChainV1.sol#106)
+CertLib.effectiveStatus(ICertificateRegistry.Status,uint64) (contracts/libraries/CertLib.sol#14-23) uses timestamp for comparisons
+	Dangerous comparisons:
+	- stored == ICertificateRegistry.Status.Valid && expiresAt != 0 && block.timestamp >= expiresAt (contracts/libraries/CertLib.sol#19)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in CertiChain.withdrawSlashed(address) (contracts/CertiChain.sol#110-118):
+	- (ok,None) = to.call{value: amount}() (contracts/CertiChain.sol#115)
+Low level call in CertiChain.withdrawStake() (contracts/CertiChain.sol#132-140):
+	- (ok,None) = msg.sender.call{value: amount}() (contracts/CertiChain.sol#137)
+Low level call in CertiChainV1.withdrawStake() (contracts/audit/CertiChainV1.sol#56-62):
+	- msg.sender.call{value: amount}() (contracts/audit/CertiChainV1.sol#59)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Slither:. analyzed (9 contracts with 102 detectors), 10 result(s) found

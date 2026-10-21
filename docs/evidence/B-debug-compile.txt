@@ -1,0 +1,19 @@
+$ solc docs/debug/Broken.sol   # percobaan 1
+Error: Expected ';' but got 'return'
+ --> docs/debug/Broken.sol:9:9:
+  |
+9 |         return exp;                      // KESALAHAN 2: titik koma hilang di baris sebelumnya
+  |         ^^^^^^
+
+
+$ solc docs/debug/Fixed_step1.sol   # setelah menambah titik koma (percobaan 2)
+Error: Type uint256 is not implicitly convertible to expected type uint64.
+ --> docs/debug/Fixed_step1.sol:7:9:
+  |
+7 |         uint64 exp = expiresAt;          // KESALAHAN 1: konversi implisit uint256 -> uint64 tidak diizinkan
+  |         ^^^^^^^^^^^^^^^^^^^^^^
+
+
+$ solc docs/debug/Fixed.sol   # setelah explicit cast uint64(expiresAt) (percobaan 3)
+Compiler run successful. No output generated.
+exit code: 0
