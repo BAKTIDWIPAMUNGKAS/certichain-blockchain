@@ -1,0 +1,25 @@
+{
+  "name": "certichain-uas-blockchain",
+  "version": "1.0.0",
+  "description": "CertiChain - Registri sertifikat digital berbasis smart contract (UAS Blockchain, Univ. Siliwangi)",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "node": "hardhat node",
+    "deploy": "hardhat run scripts/deploy.js --network localhost",
+    "interact": "hardhat run scripts/interact.js --network localhost"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "chai": "^4.5.0",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.17",
+    "hardhat-gas-reporter": "^1.0.10",
+    "solidity-coverage": "^0.8.14"
+  }
+}
