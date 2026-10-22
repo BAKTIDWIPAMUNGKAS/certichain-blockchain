@@ -3,7 +3,7 @@
 UAS Blockchain (KP70067008) · Program Studi Informatika · Universitas Siliwangi · TA 2026/2027 Ganjil
 Dosen pengampu: Dr. Ir. Nur Widiyasono, M.Kom.
 
-> **Use case:** penerbitan dan verifikasi sertifikat/ijazah digital lintas pihak (issuer, holder, verifier, admin). Hanya *hash* dokumen yang dicatat on-chain. Use case ini adalah **asumsi tim**; sesuaikan dengan use case yang disetujui dosen sebelum UTS bila berbeda.
+> **Use case:** penerbitan dan verifikasi sertifikat/ijazah digital lintas pihak (issuer, holder, verifier, admin). Hanya *hash* dokumen yang dicatat on-chain. UAS ini dikerjakan secara individu.
 
 ## Peringatan keamanan
 Semua pengujian memakai **local blockchain Hardhat (chain ID 31337)**. Akun yang dipakai adalah akun uji bawaan Hardhat yang kuncinya publik. **Dilarang** memakai private key utama, seed phrase pribadi, aset kripto nyata, atau jaringan produksi. Jangan menyimpan kunci di repositori (`.env` sudah di-`.gitignore`).
@@ -46,4 +46,4 @@ Frontend: jalankan `npx http-server frontend` (atau buka berkas langsung), tempe
 37 tes lulus; coverage `CertiChain.sol`: 100 % statement/function/line, 90 % branch. Detail: `docs/Security_Audit.md`, `docs/Deployment_Record.md`.
 
 ## Lisensi & atribusi
-MIT. Kode kontrak ditulis tim; pola Checks-Effects-Interactions dan reentrancy guard mengikuti praktik umum (rujukan: dokumentasi Solidity, OpenZeppelin ReentrancyGuard sebagai pembanding konsep). Diagram dibuat dengan Graphviz.
+MIT. Kode kontrak ditulis sendiri oleh penulis; pola Checks-Effects-Interactions dan reentrancy guard mengikuti praktik umum (rujukan: dokumentasi Solidity, OpenZeppelin ReentrancyGuard sebagai pembanding konsep). Diagram dibuat dengan Graphviz.

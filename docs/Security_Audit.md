@@ -6,7 +6,7 @@
 **Jaringan uji:** Hardhat local network, chain ID 31337 (tanpa aset nyata)  
 **Jejak commit:** baseline `1caf3a8` → PoC eksploit `5b6ae73` → perbaikan + retest `713466f` → deploy/integrasi `0ebe60b`  
 
-> Catatan metodologi: V1 ditulis sebagai baseline yang **sengaja memuat pola kerentanan umum** agar efektivitas mitigasi dapat dibuktikan secara terukur (PoC sebelum, retest sesudah). Audit ini adalah audit mandiri tim, bukan pengganti audit profesional.
+> Catatan metodologi: V1 ditulis sebagai baseline yang **sengaja memuat pola kerentanan umum** agar efektivitas mitigasi dapat dibuktikan secara terukur (PoC sebelum, retest sesudah). Audit ini dilakukan sendiri oleh penulis, bukan pengganti audit profesional.
 
 ## 1. Threat model ringkas
 
