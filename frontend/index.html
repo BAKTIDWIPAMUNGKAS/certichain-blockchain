@@ -55,7 +55,15 @@ const ABI = [
   "function revokeCertificate(bytes32 id, bytes32 reasonCode)",
   "function verifyCertificate(bytes32 id) view returns (uint8 status, address issuer, address holder, bytes32 docHash, uint64 issuedAt, uint64 expiresAt)",
   "event CertificateIssued(bytes32 indexed id, address indexed issuer, address indexed holder, bytes32 docHash, uint64 expiresAt)",
-  "event CertificateRevoked(bytes32 indexed id, address indexed revokedBy, bytes32 reasonCode)"
+  "event CertificateRevoked(bytes32 indexed id, address indexed revokedBy, bytes32 reasonCode)",
+  "error AlreadyIssued(bytes32 id)",
+  "error AlreadyRevoked(bytes32 id)",
+  "error CertNotFound(bytes32 id)",
+  "error NotAuthorized(bytes32 role, address account)",
+  "error InvalidHash()",
+  "error InvalidExpiry()",
+  "error ZeroAddress()",
+  "error Paused()",
 ];
 const STATUS = ["NotFound", "Valid", "Revoked", "Expired"];
 const $ = (id) => document.getElementById(id);
@@ -93,7 +101,7 @@ $("btnIssue").onclick = async () => {
     const tx = await contract.issueCertificate(docHash, $("holderIn").value.trim(), 0);
     const r = await tx.wait();
     show($("txOut"), `OK  tx=${tx.hash}\nblock=${r.blockNumber}\nEvent CertificateIssued dicatat.`);
-  } catch (e) { show($("txOut"), "Ditolak kontrak: " + (e.reason || e.shortMessage || e.message), true); }
+  } catch (e) { show($("txOut"), "Ditolak kontrak: " + (e.revert ? e.revert.name : (e.reason || e.shortMessage || e.message)), true); }
 };
 
 $("btnRevoke").onclick = async () => {
